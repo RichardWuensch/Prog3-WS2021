@@ -11,7 +11,7 @@ class BoardManager {
     Prog3::Api::Parser::ParserIf &parser;
 
   public:
-    BoardManager(Prog3::Api::Parser::ParserIf &givenParser, Prog3::Repository::RepositoryIf &givenRepository);
+    BoardManager(Prog3::Api::Parser::ParserIf &givenParser, Prog3::Repository::RepositoryIf &givenRepository); //losgelöst von JSON und DB
     ~BoardManager();
 
     std::string getBoard();

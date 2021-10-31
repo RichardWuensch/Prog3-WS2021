@@ -9,7 +9,7 @@
 
 int main() {
     crow::SimpleApp crowApplication;
-    Prog3::Repository::SQLite::BoardRepository sqlRepository;
+    Prog3::Repository::SQLite::BoardRepository sqlRepository;             //hier kann auch andere DB instanziiert werden
     Prog3::Api::Parser::JsonParser jsonParser;
 
     Prog3::Core::BoardManager boardManager(jsonParser, sqlRepository);
