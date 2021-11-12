@@ -226,7 +226,7 @@ std::optional<Prog3::Core::Model::Item> BoardRepository::putItem(int columnId, i
     char *errorMessage = nullptr;
     int result = 0;
 
-    // COMMENT THIS IS IN IF YOU WANT TO PREVENT USERS CREATING RESOURCES VIA PUT INSTEAD OF POST
+    //  COMMENT THIS IS IN IF YOU WANT TO PREVENT USERS CREATING RESOURCES VIA PUT INSTEAD OF POST
     string emptyString = "";
     void *selectResult = static_cast<void *>(&emptyString);
     string sqlSelect = "SELECT * FROM item WHERE id =" + to_string(itemId) + ";";
