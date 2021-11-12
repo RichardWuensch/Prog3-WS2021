@@ -219,7 +219,7 @@ std::optional<Item> BoardRepository::postItem(int columnId, std::string title, i
     return std::nullopt;
 }
 
-std::optional<Prog3::Core::Model::Item> BoardRepository::putItem(int columnId, int itemId, std::string title, int position) {
+std::optional<Prog3::Core::Model::Item> BoardRepository::putItem(int columnId, int itemId, string title, int position) {
     time_t now = time(0);
     char *datetime = ctime(&now);
 
@@ -308,5 +308,13 @@ void BoardRepository::createDummyData() {
   I want to show you how the signature of this "callback function" may look like in order to work with sqlite3_exec()
 */
 int BoardRepository::queryCallback(void *data, int numberOfColumns, char **fieldValues, char **columnNames) {
+    string *stringPointer = static_cast<string *>(data);
+    int size = sizeof(columnNames) / sizeof(columnNames[0]);
+    for (int i = 0; i < numberOfColumns; i++) {
+        *stringPointer = *stringPointer + columnNames[i] + ":" + fieldValues[i];
+        if (i < numberOfColumns - 1)
+            *stringPointer = *stringPointer + ",";
+    }
+    *stringPointer = *stringPointer + ";";
     return 0;
 }
