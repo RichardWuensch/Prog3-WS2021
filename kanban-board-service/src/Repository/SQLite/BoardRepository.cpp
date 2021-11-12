@@ -219,7 +219,7 @@ std::optional<Item> BoardRepository::postItem(int columnId, std::string title, i
     return std::nullopt;
 }
 
-std::optional<Prog3::Core::Model::Item> BoardRepository::putItem(int columnId, int itemId, string title, int position) {
+std::optional<Prog3::Core::Model::Item> BoardRepository::putItem(int columnId, int itemId, std::string title, int position) {
     time_t now = time(0);
     char *datetime = ctime(&now);
 
