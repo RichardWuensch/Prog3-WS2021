@@ -162,7 +162,7 @@ std::optional<Prog3::Core::Model::Column> BoardRepository::putColumn(int id, std
     string sqlSelectColumn = "SELECT * from column WHERE id=" + to_string(id) + ";";
 
     // CHECK IF COLUMN EXISTS
-    result = sqlite3_exec(database, sqlSelectColumn.c_str(), BoardRepository::queryCallback, thisColumn, &errorMessage);
+    result = sqlite3_exec(database, sqlSelectColumn.c_str(), queryCallback, thisColumn, &errorMessage);
     handleSQLError(result, errorMessage);
     string *tempPointer = static_cast<string *>(thisColumn);
     string thisColumnString = *tempPointer;
@@ -170,7 +170,7 @@ std::optional<Prog3::Core::Model::Column> BoardRepository::putColumn(int id, std
         return nullopt;
 
     // GET ALL ITEMS OUT OF THE COLUMN
-    result = sqlite3_exec(database, sqlSelectItems.c_str(), BoardRepository::queryCallback, selectResult, &errorMessage);
+    result = sqlite3_exec(database, sqlSelectItems.c_str(), queryCallback, selectResult, &errorMessage);
     handleSQLError(result, errorMessage);
     string *sp = static_cast<string *>(selectResult);
     string data = *sp;
@@ -288,7 +288,7 @@ std::optional<Prog3::Core::Model::Item> BoardRepository::putItem(int columnId, i
     string emptyString = "";
     void *selectResult = static_cast<void *>(&emptyString);
     string sqlSelect = "SELECT * FROM item WHERE id =" + to_string(itemId) + ";";
-    int selectAnswer = sqlite3_exec(database, sqlSelect.c_str(), BoardRepository::queryCallback, selectResult, &errorMessage);
+    int selectAnswer = sqlite3_exec(database, sqlSelect.c_str(), queryCallback, selectResult, &errorMessage);
     handleSQLError(selectAnswer, errorMessage);
 
     string *tempPointer = static_cast<string *>(selectResult);
