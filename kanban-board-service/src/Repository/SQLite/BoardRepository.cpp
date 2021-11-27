@@ -66,10 +66,8 @@ void BoardRepository::initialize() {
 }
 
 Board BoardRepository::getBoard() {
-
-    Board board = Board(boardTitle);
-
     vector<Column> columns = getColumns();
+    Board board("Kanban Board");
     board.setColumns(columns);
 
     return board;
@@ -120,8 +118,6 @@ std::optional<Column> BoardRepository::getColumn(int id) {
 }
 
 std::optional<Column> BoardRepository::postColumn(std::string name, int position) {
-    // throw NotImplementedException();
-
     string sqlPostItem =
         "INSERT INTO column('name', 'position') "
         "VALUES('" +
@@ -137,96 +133,51 @@ std::optional<Column> BoardRepository::postColumn(std::string name, int position
         int columnId = sqlite3_last_insert_rowid(database);
         return Column(columnId, name, position);
     }
+
     return std::nullopt;
 }
 
-template <typename Out>
-void split(const std::string &s, char delim, Out result) {
-    std::istringstream iss(s);
-    std::string item;
-    while (std::getline(iss, item, delim)) {
-        *result++ = item;
-    }
-}
-
-std::vector<std::string> split(const std::string &s, char delim) {
-    std::vector<std::string> elems;
-    split(s, delim, std::back_inserter(elems));
-    return elems;
-}
-
 std::optional<Prog3::Core::Model::Column> BoardRepository::putColumn(int id, std::string name, int position) {
+    string sqlPutColumn =
+        "UPDATE column "
+        "SET name = '" +
+        name + "', position = '" + to_string(position) + "'"
+                                                         "WHERE id = '" +
+        to_string(id) + "';";
+
     int result = 0;
     char *errorMessage = nullptr;
-    string emptyString = "";
-    string emptyStringThisColumn = "";
-    void *selectResult = static_cast<void *>(&emptyString);
-    void *thisColumn = static_cast<void *>(&emptyStringThisColumn);
 
-    string sqlSelectItems = "SELECT * from item WHERE column_id=" + to_string(id) + ";";
-    string sqlPutColumn = "UPDATE column SET name= \"" + name + "\", position = " + to_string(position) + " WHERE id = " + to_string(id) + ";";
-    string sqlSelectColumn = "SELECT * from column WHERE id=" + to_string(id) + ";";
-
-    // CHECK IF COLUMN EXISTS
-    result = sqlite3_exec(database, sqlSelectColumn.c_str(), queryCallback, thisColumn, &errorMessage);
-    handleSQLError(result, errorMessage);
-    string *tempPointer = static_cast<string *>(thisColumn);
-    string thisColumnString = *tempPointer;
-    if (thisColumnString == "")
-        return nullopt;
-
-    // GET ALL ITEMS OUT OF THE COLUMN
-    result = sqlite3_exec(database, sqlSelectItems.c_str(), queryCallback, selectResult, &errorMessage);
-    handleSQLError(result, errorMessage);
-    string *sp = static_cast<string *>(selectResult);
-    string data = *sp;
-    vector items = split(data, ';');
-    vector<Item> realItems{};
-    for (auto item : items) {
-        vector tuples = split(item, ',');
-
-        string itemIdString = split(tuples[0], ':')[1];
-        int itemId = stoi(itemIdString);
-
-        string title = split(tuples[1], ':')[1];
-
-        string datetime = split(tuples[2], ':')[1];
-
-        string positionString = split(tuples[3], ':')[1];
-        int position = stoi(positionString);
-
-        // cout << "Id: " + to_string(itemId) + " title: " + title + " position: " + to_string(position) + " datetime: " + datetime << endl;
-        realItems.push_back(Item(itemId, title, position, datetime));
-    }
-
-    // UPDATE COLUMN
-    errorMessage = nullptr;
     result = sqlite3_exec(database, sqlPutColumn.c_str(), NULL, 0, &errorMessage);
     handleSQLError(result, errorMessage);
 
-    if (SQLITE_OK != result) {
-        cout << "Could not edit column with id " + to_string(id) + "." << endl;
-        return nullopt;
+    if (SQLITE_OK == result) {
+        result = sqlite3_changes(database);
+        if (1 == result) {
+            Column returnColumn(id, name, position);
+            for (Item i : getItems(id)) {
+                returnColumn.addItem(i);
+            }
+            return returnColumn;
+        }
     }
-    cout << "Column with id " + to_string(id) + " sucessfully edited" << endl;
-    Column column(id, name, position);
-    for (auto item : realItems) {
-        column.addItem(item);
-    }
-    return column;
+    return std::nullopt;
 }
 
 void BoardRepository::deleteColumn(int id) {
+    string sqlDeleteItem = "DELETE FROM column "
+                           "WHERE id = " +
+                           to_string(id);
+
     int result = 0;
     char *errorMessage = nullptr;
 
-    string sqlDeleteColumn =
-        "delete from column "
-        "where id = " +
-        std::to_string(id);
-
-    result = sqlite3_exec(database, sqlDeleteColumn.c_str(), NULL, 0, &errorMessage);
+    result = sqlite3_exec(database, sqlDeleteItem.c_str(), NULL, 0, &errorMessage);
     handleSQLError(result, errorMessage);
+
+    if (SQLITE_OK == result) {
+        return;
+    }
 }
 
 std::vector<Item> BoardRepository::getItems(int columnId) {
@@ -283,48 +234,34 @@ std::optional<Item> BoardRepository::postItem(int columnId, std::string title, i
     return std::nullopt;
 }
 
-std::optional<Prog3::Core::Model::Item> BoardRepository::putItem(int columnId, int itemId, string title, int position) {
-    time_t now = time(0);
-    char *datetime = ctime(&now);
-
-    char *errorMessage = nullptr;
+std::optional<Prog3::Core::Model::Item> BoardRepository::putItem(int columnId, int itemId, std::string title, int position) {
+    // comment
     int result = 0;
+    char *errorMessage = nullptr;
 
-    //  COMMENT THIS IS IN IF YOU WANT TO PREVENT USERS CREATING RESOURCES VIA PUT INSTEAD OF POST
-    string emptyString = "";
-    void *selectResult = static_cast<void *>(&emptyString);
-    string sqlSelect = "SELECT * FROM item WHERE id =" + to_string(itemId) + ";";
-    int selectAnswer = sqlite3_exec(database, sqlSelect.c_str(), queryCallback, selectResult, &errorMessage);
-    handleSQLError(selectAnswer, errorMessage);
+    string sqlPutItem =
+        "UPDATE item SET title = '" + title + "', position = '" + to_string(position) + "' WHERE id = '" +
+        to_string(itemId) + "' AND column_id = '" + to_string(columnId) + "'";
 
-    string *tempPointer = static_cast<string *>(selectResult);
-    string thisItemString = *tempPointer;
-    if (thisItemString == "") {
-        return nullopt;
-    }
-
-    string sqlPutItem = "UPDATE item SET title =\"" + title + "\"" + ", position =" + to_string(position) + ", column_id= " + to_string(columnId) + " WHERE id = " + to_string(itemId) + ";";
-
-    result = sqlite3_exec(database, sqlPutItem.c_str(), NULL, 0, &errorMessage);
+    Item item(0, "", 0, "");
+    result = sqlite3_exec(database, sqlPutItem.c_str(), queryCallbackSingleItem, &item, &errorMessage);
     handleSQLError(result, errorMessage);
-
-    if (SQLITE_OK != result) {
-        cout << "Could not edit item with id " + to_string(itemId) + "." << endl;
-        return nullopt;
+    if (SQLITE_OK == result) {
+        result = sqlite3_changes(database);
+        if (1 == result) {
+            return Item(itemId, title, position, "datetime");
+        }
     }
-    std::cout << "Item with id " + to_string(itemId) + " sucessfully edited" << endl;
-    return Item(itemId, title, position, datetime);
+    return std::nullopt;
 }
 
 void BoardRepository::deleteItem(int columnId, int itemId) {
+    string sqlDeleteItem = "DELETE FROM item "
+                           "WHERE id = " +
+                           to_string(itemId) + " AND column_id = " + to_string(columnId);
+
     int result = 0;
     char *errorMessage = nullptr;
-
-    string sqlDeleteItem =
-        "delete from item "
-        "where id = " +
-        to_string(itemId) +
-        " and column_id = " + to_string(columnId);
 
     result = sqlite3_exec(database, sqlDeleteItem.c_str(), NULL, 0, &errorMessage);
     handleSQLError(result, errorMessage);
@@ -365,23 +302,15 @@ void BoardRepository::createDummyData() {
     result = sqlite3_exec(database, sqlInserDummyItems.c_str(), NULL, 0, &errorMessage);
     handleSQLError(result, errorMessage);
 }
-
+// static vector<Item> getVector() {
+//     static vector<Item> items;
+//     return items;
+// }
 /*
   I know source code comments are bad, but this one is to guide you through the use of sqlite3_exec() in case you want to use it.
   sqlite3_exec takes a "Callback function" as one of its arguments, and since there are many crazy approaches in the wild internet,
   I want to show you how the signature of this "callback function" may look like in order to work with sqlite3_exec()
 */
-int BoardRepository::queryCallback(void *data, int numberOfColumns, char **fieldValues, char **columnNames) {
-    string *stringPointer = static_cast<string *>(data);
-    int size = sizeof(columnNames) / sizeof(columnNames[0]);
-    for (int i = 0; i < numberOfColumns; i++) {
-        *stringPointer = *stringPointer + columnNames[i] + ":" + fieldValues[i];
-        if (i < numberOfColumns - 1)
-            *stringPointer = *stringPointer + ",";
-    }
-    *stringPointer = *stringPointer + ";";
-    return 0;
-}
 int BoardRepository::queryCallbackAllItems(void *data, int numberOfColumns, char **fieldValues, char **columnNames) {
     vector<Item> *items = static_cast<vector<Item> *>(data);
 
