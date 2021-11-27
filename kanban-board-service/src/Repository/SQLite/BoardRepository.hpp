@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Repository/RepositoryIf.hpp"
 #include "sqlite3.h"
 
@@ -9,19 +10,20 @@ namespace SQLite {
 class BoardRepository : public RepositoryIf {
   private:
     sqlite3 *database;
+    std::string sqlResultString;
 
     void initialize();
     void createDummyData();
     void handleSQLError(int statementResult, char *errorMessage);
-    // static std::vector<Prog3::Core::Model::Item> getVector();
+
     static bool isValid(int id) {
         return id != INVALID_ID;
     }
 
-    static int queryCallbackAllItems(void *data, int numberOfColumns, char **fieldValues, char **columnNames);
-    static int queryCallbackSingleItem(void *data, int numberOfColumns, char **fieldValues, char **columnNames);
-    static int queryCallbackSingleColumn(void *data, int numberOfColumns, char **fieldValues, char **columnNames);
-    static int queryCallbackAllColumns(void *data, int numberOfColumns, char **fieldValues, char **columnNames);
+    static int getItemCallback(void *data, int numberOfColumns, char **fieldValues, char **columnNames);
+    static int getColumnCallback(void *data, int numberOfColumns, char **fieldValues, char **columnNames);
+    static int queryCallback(void *data, int numberOfColumns, char **fieldValues, char **columnNames);
+    static int getIdCallback(void *data, int numberOfColumns, char **fieldValues, char **columnNames);
 
   public:
     BoardRepository();
