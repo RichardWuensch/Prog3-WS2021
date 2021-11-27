@@ -66,7 +66,13 @@ void BoardRepository::initialize() {
 }
 
 Board BoardRepository::getBoard() {
-    throw NotImplementedException();
+
+    Board board = Board(boardTitle);
+
+    vector<Column> columns = getColumns();
+    board.setColumns(columns);
+
+    return board;
 }
 
 std::vector<Column> BoardRepository::getColumns() {
