@@ -425,7 +425,7 @@ int BoardRepository::getItemCallback(void *data, int numberOfColumns, char **fie
     items->push_back(temp);
     return 0;
 }
-
+// fb
 int BoardRepository::getIdCallback(void *data, int numberOfColumns, char **fieldValues, char **columnNames) {
     if (numberOfColumns == 0) {
         return 0;
