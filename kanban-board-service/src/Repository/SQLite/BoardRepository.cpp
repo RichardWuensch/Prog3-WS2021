@@ -393,7 +393,7 @@ int BoardRepository::queryCallback(void *data, int numberOfColumns, char **field
     return 0;
 }
 
-// id:5,title:test,position:100;id:6,title:test2,postion101
+// id:5,title:test,position:100;id:6,title:test2,postion 101
 
 int BoardRepository::getColumnCallback(void *data, int numberOfColumns, char **fieldValues, char **columnNames) {
     Column *column = static_cast<Column *>(data);
