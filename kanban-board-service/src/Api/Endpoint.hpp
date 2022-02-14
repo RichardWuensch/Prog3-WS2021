@@ -1,22 +1,22 @@
 #pragma once
 
-#include "Core/Manager.hpp"
+#include "Core/BoardManager.hpp"
 #include "crow.h"
 
-namespace Reminder {
+namespace Prog3 {
 namespace Api {
 
 class Endpoint {
   public:
-    Endpoint(crow::SimpleApp &givenApp, Reminder::Core::Manager &givenManager);
+    Endpoint(crow::SimpleApp &givenApp, Prog3::Core::BoardManager &givenBoardManager);
     ~Endpoint();
 
     void registerRoutes();
 
   private:
     crow::SimpleApp &app;
-    Reminder::Core::Manager &manager;
+    Prog3::Core::BoardManager &boardManager;
 };
 
 } // namespace Api
-} // namespace Reminder
+} // namespace Prog3

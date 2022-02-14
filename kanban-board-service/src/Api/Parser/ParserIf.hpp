@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Core/Model/ToDo.hpp"
+#include "Core/Model/Board.hpp"
 #include "optional"
 
-namespace Reminder {
+namespace Prog3 {
 namespace Api {
 namespace Parser {
 
@@ -13,17 +13,17 @@ class ParserIf {
 
     virtual std::string getEmptyResponseString() = 0;
 
-    virtual std::string convertToApiString(Reminder::Core::Model::ToDo &toDo) = 0;
-    virtual std::string convertToApiString(Reminder::Core::Model::List &list) = 0;
-    virtual std::string convertToApiString(std::vector<Reminder::Core::Model::List> &lists) = 0;
+    virtual std::string convertToApiString(Prog3::Core::Model::Board &board) = 0;
+    virtual std::string convertToApiString(Prog3::Core::Model::Column &column) = 0;
+    virtual std::string convertToApiString(std::vector<Prog3::Core::Model::Column> &columns) = 0;
 
-    virtual std::string convertToApiString(Reminder::Core::Model::Item &item) = 0;
-    virtual std::string convertToApiString(std::vector<Reminder::Core::Model::Item> &items) = 0;
+    virtual std::string convertToApiString(Prog3::Core::Model::Item &item) = 0;
+    virtual std::string convertToApiString(std::vector<Prog3::Core::Model::Item> &items) = 0;
 
-    virtual std::optional<Reminder::Core::Model::List> convertListToModel(int listId, std::string &request) = 0;
-    virtual std::optional<Reminder::Core::Model::Item> convertItemToModel(int itemId, std::string &request) = 0;
+    virtual std::optional<Prog3::Core::Model::Column> convertColumnToModel(int columnId, std::string &request) = 0;
+    virtual std::optional<Prog3::Core::Model::Item> convertItemToModel(int itemId, std::string &request) = 0;
 };
 
 } // namespace Parser
 } // namespace Api
-} // namespace Reminder
+} // namespace Prog3

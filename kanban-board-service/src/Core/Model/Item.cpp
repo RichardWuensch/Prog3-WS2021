@@ -1,9 +1,9 @@
 #include "Item.hpp"
 
-using namespace Reminder::Core::Model;
+using namespace Prog3::Core::Model;
 
-Item::Item(int id, std::string givenTitle, int givenPosition, int givenFlag, int givenDone, std::string givenDatum, std::string givenTimestamp)
-    : id(id), title(givenTitle), position(givenPosition), flag(givenFlag), done(givenDone), datum(givenDatum), timestamp(givenTimestamp) {}
+Item::Item(int id, std::string givenTitle, int givenPosition, std::string givenTimestamp)
+    : id(id), title(givenTitle), position(givenPosition), timestamp(givenTimestamp) {}
 
 int Item::getId() const {
     return id;
@@ -21,18 +21,6 @@ std::string Item::getTimestamp() const {
     return timestamp;
 }
 
-int Item::getFlag() const {
-    return flag;
-}
-
-int Item::getDone() const {
-    return done;
-}
-
-std::string Item::getDatum() const {
-    return datum;
-}
-
 void Item::setID(int givenID) {
     id = givenID;
 }
@@ -47,16 +35,4 @@ void Item::setPos(int givenPos) {
 
 void Item::setTimestamp(std::string givenTime) {
     timestamp = givenTime;
-}
-
-void Item::setFlag(int givenFlag) {
-    flag = givenFlag;
-}
-
-void Item::setDone(int givenDone) {
-    done = givenDone;
-}
-
-void Item::setDatum(std::string givenDatum) {
-    datum = givenDatum;
 }
