@@ -1,26 +1,26 @@
 #pragma once
 
-#include "Core/Model/Board.hpp"
+#include "Core/Model/ToDo.hpp"
 #include "optional"
 
-namespace Prog3 {
+namespace Reminder {
 namespace Repository {
 class RepositoryIf {
   public:
     virtual ~RepositoryIf() {}
 
-    virtual Prog3::Core::Model::Board getBoard() = 0;
-    virtual std::vector<Prog3::Core::Model::Column> getColumns() = 0;
-    virtual std::optional<Prog3::Core::Model::Column> getColumn(int id) = 0;
-    virtual std::optional<Prog3::Core::Model::Column> postColumn(std::string name, int position) = 0;
-    virtual std::optional<Prog3::Core::Model::Column> putColumn(int id, std::string name, int position) = 0;
-    virtual void deleteColumn(int id) = 0;
-    virtual std::vector<Prog3::Core::Model::Item> getItems(int columnId) = 0;
-    virtual std::optional<Prog3::Core::Model::Item> getItem(int columnId, int itemId) = 0;
-    virtual std::optional<Prog3::Core::Model::Item> postItem(int columnId, std::string title, int position) = 0;
-    virtual std::optional<Prog3::Core::Model::Item> putItem(int columnId, int itemId, std::string title, int position) = 0;
-    virtual void deleteItem(int columnId, int itemId) = 0;
+    virtual Reminder::Core::Model::ToDo getToDo() = 0;
+    virtual std::vector<Reminder::Core::Model::List> getLists() = 0;
+    virtual std::optional<Reminder::Core::Model::List> getList(int id) = 0;
+    virtual std::optional<Reminder::Core::Model::List> postList(std::string name, int position) = 0;
+    virtual std::optional<Reminder::Core::Model::List> putList(int id, std::string name, int position) = 0;
+    virtual void deleteList(int id) = 0;
+    virtual std::vector<Reminder::Core::Model::Item> getItems(int listId) = 0;
+    virtual std::optional<Reminder::Core::Model::Item> getItem(int listId, int itemId) = 0;
+    virtual std::optional<Reminder::Core::Model::Item> postItem(int listId, std::string title, int position, std::string datum) = 0;
+    virtual std::optional<Reminder::Core::Model::Item> putItem(int listId, int itemId, std::string title, int position, int flag, int done, std::string datum) = 0;
+    virtual void deleteItem(int listId, int itemId) = 0;
 };
 
 } // namespace Repository
-} // namespace Prog3
+} // namespace Reminder

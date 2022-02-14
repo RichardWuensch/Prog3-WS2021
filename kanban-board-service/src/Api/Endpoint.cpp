@@ -2,13 +2,13 @@
 
 #include <iostream>
 
-using namespace Prog3::Api;
-using namespace Prog3::Core;
+using namespace Reminder::Api;
+using namespace Reminder::Core;
 using namespace crow;
 using namespace std;
 
-Endpoint::Endpoint(SimpleApp &givenApp, BoardManager &givenBoardManager) : app(givenApp),
-                                                                           boardManager(givenBoardManager) {
+Endpoint::Endpoint(SimpleApp &givenApp, Manager &givenManager) : app(givenApp),
+                                                                 manager(givenManager) {
     registerRoutes();
 }
 
@@ -16,24 +16,24 @@ Endpoint::~Endpoint() {
 }
 
 void Endpoint::registerRoutes() {
-    CROW_ROUTE(app, "/api/board")
+    CROW_ROUTE(app, "/api/todo")
     ([this](const request &req, response &res) {
-        std::string jsonBoards = boardManager.getBoard();
-        res.write(jsonBoards);
+        std::string jsonToDos = manager.getToDo();
+        res.write(jsonToDos);
         res.end();
     });
 
-    CROW_ROUTE(app, "/api/board/columns")
+    CROW_ROUTE(app, "/api/todo/lists")
         .methods("GET"_method, "POST"_method)([this](const request &req, response &res) {
-            std::string jsonColumns;
+            std::string jsonLists;
 
             switch (req.method) {
             case HTTPMethod::Get: {
-                jsonColumns = boardManager.getColumns();
+                jsonLists = manager.getLists();
                 break;
             }
             case HTTPMethod::Post: {
-                jsonColumns = boardManager.postColumn(req.body);
+                jsonLists = manager.postList(req.body);
                 res.code = 201;
                 break;
             }
@@ -42,25 +42,25 @@ void Endpoint::registerRoutes() {
             }
             }
 
-            res.write(jsonColumns);
+            res.write(jsonLists);
             res.end();
         });
 
-    CROW_ROUTE(app, "/api/board/columns/<int>")
-        .methods("GET"_method, "PUT"_method, "DELETE"_method)([this](const request &req, response &res, int columnID) {
-            std::string jsonColumn = "{}";
+    CROW_ROUTE(app, "/api/todo/lists/<int>")
+        .methods("GET"_method, "PUT"_method, "DELETE"_method)([this](const request &req, response &res, int listID) {
+            std::string jsonList = "{}";
 
             switch (req.method) {
             case HTTPMethod::Get: {
-                jsonColumn = boardManager.getColumn(columnID);
+                jsonList = manager.getList(listID);
                 break;
             }
             case HTTPMethod::Put: {
-                jsonColumn = boardManager.putColumn(columnID, req.body);
+                jsonList = manager.putList(listID, req.body);
                 break;
             }
             case HTTPMethod::Delete: {
-                boardManager.deleteColumn(columnID);
+                manager.deleteList(listID);
                 break;
             }
             default: {
@@ -68,21 +68,21 @@ void Endpoint::registerRoutes() {
             }
             }
 
-            res.write(jsonColumn);
+            res.write(jsonList);
             res.end();
         });
 
-    CROW_ROUTE(app, "/api/board/columns/<int>/items")
-        .methods("GET"_method, "POST"_method)([this](const request &req, response &res, int columnID) {
+    CROW_ROUTE(app, "/api/todo/lists/<int>/items")
+        .methods("GET"_method, "POST"_method)([this](const request &req, response &res, int listID) {
             std::string jsonItem;
 
             switch (req.method) {
             case HTTPMethod::Get: {
-                jsonItem = boardManager.getItems(columnID);
+                jsonItem = manager.getItems(listID);
                 break;
             }
             case HTTPMethod::Post: {
-                jsonItem = boardManager.postItem(columnID, req.body);
+                jsonItem = manager.postItem(listID, req.body);
                 res.code = 201;
                 break;
             }
@@ -95,21 +95,21 @@ void Endpoint::registerRoutes() {
             res.end();
         });
 
-    CROW_ROUTE(app, "/api/board/columns/<int>/items/<int>")
-        .methods("GET"_method, "PUT"_method, "DELETE"_method)([this](const request &req, response &res, int columnID, int itemID) {
+    CROW_ROUTE(app, "/api/todo/lists/<int>/items/<int>")
+        .methods("GET"_method, "PUT"_method, "DELETE"_method)([this](const request &req, response &res, int listID, int itemID) {
             std::string jsonItem;
 
             switch (req.method) {
             case HTTPMethod::Get: {
-                jsonItem = boardManager.getItem(columnID, itemID);
+                jsonItem = manager.getItem(listID, itemID);
                 break;
             }
             case HTTPMethod::Put: {
-                jsonItem = boardManager.putItem(columnID, itemID, req.body);
+                jsonItem = manager.putItem(listID, itemID, req.body);
                 break;
             }
             case HTTPMethod::Delete: {
-                boardManager.deleteItem(columnID, itemID);
+                manager.deleteItem(listID, itemID);
                 break;
             }
             default: {

@@ -3,17 +3,17 @@
 
 #include "Api/Endpoint.hpp"
 #include "Api/Parser/JsonParser.hpp"
-#include "Core/BoardManager.hpp"
-#include "Repository/SQLite/BoardRepository.hpp"
+#include "Core/Manager.hpp"
+#include "Repository/SQLite/SQLiteRepository.hpp"
 #include "crow.h"
 
 int main() {
     crow::SimpleApp crowApplication;
-    Prog3::Repository::SQLite::BoardRepository sqlRepository;             //hier kann auch andere DB instanziiert werden
-    Prog3::Api::Parser::JsonParser jsonParser;
+    Reminder::Repository::SQLite::SQLiteRepository sqlRepository;
+    Reminder::Api::Parser::JsonParser jsonParser;
 
-    Prog3::Core::BoardManager boardManager(jsonParser, sqlRepository);
-    Prog3::Api::Endpoint endpoint(crowApplication, boardManager);
+    Reminder::Core::Manager manager(jsonParser, sqlRepository);
+    Reminder::Api::Endpoint endpoint(crowApplication, manager);
 
     crowApplication.port(8080)
         //        .multithreaded()
